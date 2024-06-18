@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodingDojo Wall</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style1.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CodingDojo Wall</h1>
+            <h3>Welcome {{ first_name }}</h3>
+            <a href="logout" class="logout">Log off</a>
+        </header>
+
+        <section class="post-message">
+            <h2>Post a message</h2>
+            <form action="mm/{{user.id}}" method="POST">
+                {% csrf_token %}
+                <textarea name="themessage" required></textarea>
+                <button type="submit">Post a message</button>
+            </form>
+        </section>
+
+        <section class="messages">
+            {% for message in messagess %}
+            <div class="message">
+                <h2>{{ message.user_id.first_name }} {{ message.user_id.last_name }} - {{ message.created_at }}</h2>
+                <h3>{{ message.message }}</h3> 
+                <form action="dd/{{message.id}}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+
+                <div class="comments">
+                    <h2>Post a comment</h2>
+                    {% for comment in message.comments.all %}
+                    {% if comment.message_id.id == message.id %}
+                    <div class="comment">
+                        <h2>{{ comment.user_id.first_name }} {{ comment.user_id.last_name }} - {{ comment.created_at }}</h2>
+                        <h3>{{ comment.comment }}</h3>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <form action="cc/{{user.id}}/{{message.id}}" method="POST">
+                        {% csrf_token %}
+                        <textarea name="thecomment" required></textarea>
+                        <button type="submit">Post a comment</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
+        {% if messages %}
+<ul class="messages">    
+    {% for message in messages %}    
+        <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+    {% endfor %}
+</ul>
+{% endif %}
+    </div>
+
+
+
+</body>
+</html>
